@@ -17,6 +17,8 @@ loop(S = {Rows, Columns}) ->
   receive 
     {move, right} -> 
       lists:foreach(fun slice:compress_forward/1, Rows);
+    {move, down} ->
+      lists:foreach(fun slice:compress_forward/1, Columns);
     {set_cell, XIndex, YIndex, Value} ->
       slice:set_cell(lists:nth(XIndex, Rows), YIndex, Value), 
       slice:set_cell(lists:nth(YIndex, Columns), XIndex, Value);
