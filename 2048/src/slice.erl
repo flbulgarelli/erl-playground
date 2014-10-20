@@ -12,10 +12,10 @@ loop(S = {Cells, Position, OrtogonalSlices}) ->
     {set_ortogonal, NewOrtogonalSlices} ->
       loop({Cells, Position, NewOrtogonalSlices});
     {compress, forward} ->
-      NewCels = compress:compress(Cells),
+      NewCells = compress:compress(Cells),
       [set_cell(Pid, Position, Cell) ||
-      	 {Pid, Cell} <- lists:zip(OrtogonalSlices, Cells)],
-      loop({NewCels, Position, OrtogonalSlices});
+      	 {Pid, Cell} <- lists:zip(OrtogonalSlices, NewCells)],
+      loop({NewCells, Position, OrtogonalSlices});
     {Pid, Ref, get_value} ->
       Pid ! { Ref, Cells},
       loop(S);

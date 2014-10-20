@@ -20,10 +20,10 @@ loop(S = {Rows, Columns}) ->
     {move, down} ->
       lists:foreach(fun slice:compress_forward/1, Columns);
     {set_cell, XIndex, YIndex, Value} ->
-      slice:set_cell(lists:nth(XIndex, Rows), YIndex, Value), 
-      slice:set_cell(lists:nth(YIndex, Columns), XIndex, Value);
+      slice:set_cell(lists:nth(YIndex, Rows), XIndex, Value), 
+      slice:set_cell(lists:nth(XIndex, Columns), YIndex, Value);
     {Pid, Ref, render} ->
-      Pid ! {Ref, lists:map(fun slice:get_value/1, Rows)}
+      Pid ! {Ref, lists:map(fun slice:get_value/1, Rows)};
   end,
   loop(S).
 
