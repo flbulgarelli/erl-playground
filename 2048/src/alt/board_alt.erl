@@ -1,4 +1,4 @@
--module(board).
+-module(board_alt).
 -compile(export_all).
 
 start() ->
@@ -36,27 +36,22 @@ loop(S = {Rows, Columns, Compressors, Size}) ->
 update_matrix(Type, Slice, Index, {Rows, Columns, Compressors, Size}) ->
   case Type of 
     row ->
-      {setnth(Index, Slice, Rows), set_orthogonal(Index, Slice, Columns), Compressors, Size};
+      {listsx:setnth(Index, Slice, Rows), set_orthogonal(Index, Slice, Columns), Compressors, Size};
     column ->
-      {set_orthogonal(Index, Slice, Rows), setnth(Index, Slice, Columns), Compressors, Size}
+      {set_orthogonal(Index, Slice, Rows), listsx:setnth(Index, Slice, Columns), Compressors, Size}
   end.
 
 set_orthogonal(Index, Slice, OrthogonalSlices) ->
-   [ setnth(Index, Cell, OrthogonalSlice) || 
+   [ listsx:setnth(Index, Cell, OrthogonalSlice) || 
       {Cell, OrthogonalSlice} <- lists:zip(Slice, OrthogonalSlices) ].
 
 new_slice(C1, C2, Value, Slice) ->
-  setnth(C2, Value, lists:nth(C1, Slice)).
+  listsx:setnth(C2, Value, lists:nth(C1, Slice)).
 
 do_compress(Size, Type, Slices, Compressors) -> 
   lists:foreach(fun({Slice, Compressor, Index}) ->
     compressor:compress_slice(Compressor, Type, Slice, Index)
   end, lists:zip3(Slices, Compressors, lists:seq(1, Size))).
-
-setnth(Index, Value, Xs) -> setnth1(Index, Value, Xs, 1).
-
-setnth1(Index, Value, [_|Xs], N) when N =:= Index -> [Value|Xs];
-setnth1(Index, Value, [X|Xs], N) -> [X|setnth1(Index, Value, Xs, N + 1)].
 
 render(Pid) ->
   Ref = make_ref(),

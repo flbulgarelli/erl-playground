@@ -20,7 +20,7 @@ loop(S = {Cells, Position, OrtogonalSlices}) ->
       Pid ! { Ref, Cells},
       loop(S);
     {set_cell, Index, Value} ->
-      loop({listx:setnth(Index, Value, Cells), Position, OrtogonalSlices})
+      loop({listsx:setnth(Index, Value, Cells), Position, OrtogonalSlices})
   end.
 
 get_value(Pid) ->
