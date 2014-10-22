@@ -15,17 +15,21 @@ create_slices(Size) ->
 
 loop(S = {Rows, Columns}) ->
   receive 
-    {move, right} -> 
-      lists:foreach(fun slice:compress_forward/1, Rows);
-    {move, down} ->
-      lists:foreach(fun slice:compress_forward/1, Columns);
+    {Ref, move, right} -> 
+      do_move(Ref, Rows, Columns);
+    {Ref, move, down} ->
+      do_move(Ref, Columns, Rows);
     {set_cell, XIndex, YIndex, Value} ->
       slice:set_cell(lists:nth(YIndex, Rows), XIndex, Value), 
       slice:set_cell(lists:nth(XIndex, Columns), YIndex, Value);
     {Pid, Ref, render} ->
-      Pid ! {Ref, lists:map(fun slice:get_value/1, Rows)};
+      Pid ! {Ref, lists:map(fun slice:get_value/1, Rows)}
   end,
   loop(S).
+
+do_move(Ref, MovementSlices, OrtogonalSlices) ->
+  [slice:compress_forward(Ref, Slice) || Slice <- MovementSlices],
+  [slice:sync(Ref, Slice) || Slice <- OrtogonalSlices].
 
 set_cell(Pid, XIndex, YIndex, Value) ->
   Pid ! { set_cell, XIndex, YIndex, slice:value_for(Value) }.
@@ -40,5 +44,6 @@ render(Pid) ->
   end.
 
 move(Pid, Direction) ->
-   Pid ! {move, Direction}.
+   Ref = make_ref(),
+   Pid ! {Ref, move, Direction}.
 
