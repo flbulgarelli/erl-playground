@@ -23,9 +23,7 @@ ready(S = {Rows, Columns, Compressors, Size}) ->
       do_compress(Ref, Size, column, Columns, Compressors),
       waiting({Ref, S, Size});
     {set_value, X, Y, Value} ->
-      S1 = update_matrix(row, new_slice(X, Y, Value, Rows), Y, S),
-      S2 = update_matrix(column, new_slice(Y, X, Value, Columns), X, S1),
-      ready(S2);
+      ready(update_matrix(row, new_slice(X, Y, Value, Rows), Y, S));
     {Pid, Ref, render} ->
       Pid ! {Ref, Rows},
       ready(S)
@@ -53,8 +51,8 @@ set_orthogonal(Index, Slice, OrthogonalSlices) ->
    [ listsx:setnth(Index, Cell, OrthogonalSlice) || 
       {Cell, OrthogonalSlice} <- lists:zip(Slice, OrthogonalSlices) ].
 
-new_slice(C1, C2, Value, Slice) ->
-  listsx:setnth(C2, Value, lists:nth(C1, Slice)).
+new_slice(C1, C2, Value, Slices) ->
+  listsx:setnth(C1, Value, lists:nth(C2, Slices)).
 
 do_compress(Ref, Size, Type, Slices, Compressors) -> 
   lists:foreach(fun({Slice, Compressor, Index}) ->
