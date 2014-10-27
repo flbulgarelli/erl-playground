@@ -6,6 +6,5 @@ start_link() ->
 
  loop() ->
    receive
-     _ -> io:format("dying for normal reasons") 
-   end,
-   loop().
+     _ ->  io:format("dying for normal reasons")
+   end.
