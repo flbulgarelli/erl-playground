@@ -1,19 +1,19 @@
 -module(ssupervisor).
 -compile(export_all).
 
-start(UserPid) ->
-   spawn(?MODULE, init, [UserPid]).
+start(Ref, UserPid) ->
+   spawn(?MODULE, init, [Ref, UserPid]).
 
-init(UserPid) ->
+init(Ref, UserPid) ->
   process_flag(trap_exit, true),
-  supervise_new_fragile_child(UserPid).
+  supervise_new_fragile_child(Ref, UserPid).
 
-loop({UserPid, ChildPid}) ->
+loop({Ref, UserPid, ChildPid}) ->
   receive 
-     {'EXIT', ChildPid, _ } -> supervise_new_fragile_child(UserPid)
+     {'EXIT', ChildPid, _ } -> supervise_new_fragile_child(Ref, UserPid)
   end.
 
-supervise_new_fragile_child(UserPid) ->
+supervise_new_fragile_child(Ref, UserPid) ->
   ChildPid = fragile_child:start_link(),
-  UserPid ! {child_started, ChildPid},
-  loop({UserPid, ChildPid}).
+  UserPid ! {Ref, child_started, ChildPid},
+  loop({Ref, UserPid, ChildPid}).

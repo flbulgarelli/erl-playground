@@ -4,21 +4,23 @@
 
 
 supervisor_starts_child_test() ->
-  ssupervisor:start(self()),
+  Ref = make_ref(),
+  ssupervisor:start(Ref, self()),
   receive
-    {child_started, _ } -> ok
+    {Ref, child_started, _ } -> ok
   after 500 ->
    ?assert(false)
   end.
 
 supervisor_respawns_child_test() ->
-  ssupervisor:start(self()),
+  Ref = make_ref(),
+  ssupervisor:start(Ref, self()),
   receive
-    {child_started, Pid} -> ok
+    {Ref, child_started, Pid} -> ok
   end,
   Pid !  die,
   receive
-    {child_started, _} -> ok
-  	?assert(false)
+    {Ref, child_started, _} -> ok
   after 500 ->
+  	?assert(false)
   end.
